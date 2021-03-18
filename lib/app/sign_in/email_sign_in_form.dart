@@ -16,6 +16,8 @@ class EmailSignInForm extends StatefulWidget with EmailAndPasswordValidators {
 class _EmailSignInFormState extends State<EmailSignInForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
   EmailSignInFormType _formType = EmailSignInFormType.signIn;
   String get _email => _emailController.text;
   String get _password => _passwordController.text;
@@ -41,6 +43,13 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         _isLoading = false;
       });
     }
+  }
+
+  void _onEmailEditComplete() {
+    final newFocus = widget.emailValidator.isValid(_email)
+        ? _passwordFocusNode
+        : _emailFocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
   }
 
   void _toggleFormType() {
@@ -86,6 +95,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   TextField _buildEmailTextField() {
     bool showErrorText = _submitted && !widget.emailValidator.isValid(_email);
     return TextField(
+      focusNode: _emailFocusNode,
       controller: _emailController,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
@@ -95,6 +105,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       ),
       enabled: !_isLoading,
       autocorrect: false,
+      onEditingComplete: _onEmailEditComplete,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       onChanged: (email) => updateState(),
@@ -105,6 +116,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     bool showErrorText =
         _submitted && !widget.passwordValidator.isValid(_password);
     return TextField(
+      focusNode: _passwordFocusNode,
       controller: _passwordController,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
