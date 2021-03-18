@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:timer/common_widgets/show_alert_dialog.dart';
-import 'package:timer/services/auth.dart';
+import 'package:timer/services/auth_provider.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key key, @required this.auth}) : super(key: key);
-  final AuthBase auth;
-
   Future<void> _confirmSignOut(BuildContext context) async {
     final didRequestSignOut = await showAlertDialog(
       context,
@@ -15,12 +12,13 @@ class HomePage extends StatelessWidget {
       cancelActionText: 'CANCEL',
     );
     if (didRequestSignOut) {
-      _signOut();
+      _signOut(context);
     }
   }
 
-  Future<void> _signOut() async {
+  Future<void> _signOut(BuildContext context) async {
     try {
+      final auth = AuthProvider.of(context);
       await auth.signOut();
     } catch (e) {
       print(e.toString());
